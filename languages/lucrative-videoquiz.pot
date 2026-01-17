@@ -1,0 +1,301 @@
+# Copyright (C) 2024 Lucrative Interactive VideoQuiz
+# This file is distributed under the same license as the Lucrative Interactive VideoQuiz package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Lucrative Interactive VideoQuiz 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lucrative-interactive-videoquiz\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: includes/class-dashboard.php:45
+msgid "Dashboard"
+msgstr ""
+
+#: includes/class-dashboard.php:50
+msgid "Questions"
+msgstr ""
+
+#: includes/class-dashboard.php:55
+msgid "Video Quizzes"
+msgstr ""
+
+#: includes/class-dashboard.php:60
+msgid "Settings"
+msgstr ""
+
+#: includes/class-dashboard.php:65
+msgid "Reports"
+msgstr ""
+
+#: includes/class-dashboard.php:75
+msgid "Dashboard Overview"
+msgstr ""
+
+#: includes/class-dashboard.php:85
+msgid "Total Questions"
+msgstr ""
+
+#: includes/class-dashboard.php:95
+msgid "Video Quizzes"
+msgstr ""
+
+#: includes/class-dashboard.php:105
+msgid "Quiz Attempts"
+msgstr ""
+
+#: includes/class-dashboard.php:115
+msgid "Quick Actions"
+msgstr ""
+
+#: includes/class-dashboard.php:120
+msgid "Add New Question"
+msgstr ""
+
+#: includes/class-dashboard.php:125
+msgid "Create Video Quiz"
+msgstr ""
+
+#: includes/class-dashboard.php:140
+msgid "Questions Management"
+msgstr ""
+
+#: includes/class-dashboard.php:145
+msgid "Add New Question"
+msgstr ""
+
+#: includes/class-dashboard.php:180
+msgid "Add New Question"
+msgstr ""
+
+#: includes/class-dashboard.php:185
+msgid "Edit Question"
+msgstr ""
+
+#: includes/class-dashboard.php:190
+msgid "Back to Questions"
+msgstr ""
+
+#: includes/class-dashboard.php:195
+msgid "Question Title"
+msgstr ""
+
+#: includes/class-dashboard.php:200
+msgid "Question Type"
+msgstr ""
+
+#: includes/class-dashboard.php:205
+msgid "True/False"
+msgstr ""
+
+#: includes/class-dashboard.php:210
+msgid "Multiple Choice"
+msgstr ""
+
+#: includes/class-dashboard.php:215
+msgid "Options (for Multiple Choice)"
+msgstr ""
+
+#: includes/class-dashboard.php:220
+msgid "Add Option"
+msgstr ""
+
+#: includes/class-dashboard.php:225
+msgid "Remove"
+msgstr ""
+
+#: includes/class-dashboard.php:230
+msgid "Correct Answer"
+msgstr ""
+
+#: includes/class-dashboard.php:235
+msgid "True"
+msgstr ""
+
+#: includes/class-dashboard.php:240
+msgid "False"
+msgstr ""
+
+#: includes/class-dashboard.php:245
+msgid "Explanation (Optional)"
+msgstr ""
+
+#: includes/class-dashboard.php:250
+msgid "Add Question"
+msgstr ""
+
+#: includes/class-dashboard.php:255
+msgid "Update Question"
+msgstr ""
+
+#: includes/class-dashboard.php:260
+msgid "Cancel"
+msgstr ""
+
+#: includes/class-dashboard.php:270
+msgid "Video Quizzes Management"
+msgstr ""
+
+#: includes/class-dashboard.php:275
+msgid "Create Video Quiz"
+msgstr ""
+
+#: includes/class-dashboard.php:320
+msgid "Create Video Quiz"
+msgstr ""
+
+#: includes/class-dashboard.php:325
+msgid "Edit Video Quiz"
+msgstr ""
+
+#: includes/class-dashboard.php:330
+msgid "Back to Video Quizzes"
+msgstr ""
+
+#: includes/class-dashboard.php:335
+msgid "Quiz Title"
+msgstr ""
+
+#: includes/class-dashboard.php:340
+msgid "Video Type"
+msgstr ""
+
+#: includes/class-dashboard.php:345
+msgid "YouTube"
+msgstr ""
+
+#: includes/class-dashboard.php:350
+msgid "Vimeo"
+msgstr ""
+
+#: includes/class-dashboard.php:355
+msgid "MP4 Upload"
+msgstr ""
+
+#: includes/class-dashboard.php:360
+msgid "Video URL"
+msgstr ""
+
+#: includes/class-dashboard.php:365
+msgid "Enter YouTube/Vimeo URL or upload MP4 file"
+msgstr ""
+
+#: includes/class-dashboard.php:370
+msgid "Time Slots & Questions"
+msgstr ""
+
+#: includes/class-dashboard.php:375
+msgid "Add Time Slot"
+msgstr ""
+
+#: includes/class-dashboard.php:380
+msgid "Create Video Quiz"
+msgstr ""
+
+#: includes/class-dashboard.php:385
+msgid "Update Video Quiz"
+msgstr ""
+
+#: includes/class-dashboard.php:390
+msgid "Cancel"
+msgstr ""
+
+#: includes/class-dashboard.php:400
+msgid "Global Settings"
+msgstr ""
+
+#: includes/class-dashboard.php:405
+msgid "Show correct answers after submission"
+msgstr ""
+
+#: includes/class-dashboard.php:410
+msgid "Allow users to skip questions"
+msgstr ""
+
+#: includes/class-dashboard.php:415
+msgid "Completion Message"
+msgstr ""
+
+#: includes/class-dashboard.php:420
+msgid "Quiz Theme"
+msgstr ""
+
+#: includes/class-dashboard.php:425
+msgid "Default"
+msgstr ""
+
+#: includes/class-dashboard.php:430
+msgid "Modern"
+msgstr ""
+
+#: includes/class-dashboard.php:435
+msgid "Minimal"
+msgstr ""
+
+#: includes/class-dashboard.php:440
+msgid "Save Settings"
+msgstr ""
+
+#: includes/class-dashboard.php:445
+msgid "Quiz Reports"
+msgstr ""
+
+#: includes/class-dashboard.php:450
+msgid "Quiz"
+msgstr ""
+
+#: includes/class-dashboard.php:455
+msgid "User"
+msgstr ""
+
+#: includes/class-dashboard.php:460
+msgid "Score"
+msgstr ""
+
+#: includes/class-dashboard.php:465
+msgid "Completed"
+msgstr ""
+
+#: includes/class-dashboard.php:470
+msgid "Guest"
+msgstr ""
+
+#: includes/class-dashboard.php:475
+msgid "User #"
+msgstr ""
+
+#: includes/class-dashboard.php:480
+msgid "Question updated successfully!"
+msgstr ""
+
+#: includes/class-dashboard.php:485
+msgid "Question added successfully!"
+msgstr ""
+
+#: includes/class-dashboard.php:490
+msgid "Question deleted successfully!"
+msgstr ""
+
+#: includes/class-dashboard.php:495
+msgid "Video quiz updated successfully!"
+msgstr ""
+
+#: includes/class-dashboard.php:500
+msgid "Video quiz created successfully!"
+msgstr ""
+
+#: includes/class-dashboard.php:505
+msgid "Video quiz deleted successfully!"
+msgstr ""
+
+#: includes/class-dashboard.php:510
+msgid "Settings saved successfully!"
+msgstr ""
+
+#: includes/class-dashboard.php:515
+msgid "Congratulations! You have completed the video quiz."
+msgstr ""
