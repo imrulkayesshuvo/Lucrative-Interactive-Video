@@ -72,7 +72,7 @@ Lucrative Interactive VideoQuiz is a powerful WordPress plugin that transforms y
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/lucrative-interactive-videoquiz` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/lucrative-interactive-video` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Use the Video Quiz menu in your WordPress admin to start creating interactive quizzes
 4. Create questions, setup videos, and generate shortcodes to embed on your site
@@ -140,3 +140,4 @@ Absolutely! The plugin is fully responsive and works perfectly on mobile devices
 
 = 1.0.0 =
 Initial release of Lucrative Interactive VideoQuiz. Start creating engaging video quizzes today!
+

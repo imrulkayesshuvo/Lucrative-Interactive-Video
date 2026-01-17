@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: Lucrative Interactive VideoQuiz
- * Plugin URI: https://wordpress.org/plugins/lucrative-interactive-videoquiz
+ * Plugin URI: https://wordpress.org/plugins/lucrative-interactive-video
  * Description: Make your videos smarter — engage learners with in-video questions. Create interactive video quizzes with pause-and-answer functionality.
  * Version: 1.0.1
  * Author: Zahid Hasan
  * Author URI: https://wordpress.org
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: lucrative-interactive-videoquiz
+ * Text Domain: lucrative-interactive-video
  * Domain Path: /languages
  */
 
@@ -33,7 +33,7 @@ class LucrativeInteractiveVideoQuiz {
     
     public function init() {
         // Load text domain - WordPress will automatically load translations if plugin is hosted on WordPress.org
-        // load_plugin_textdomain('lucrative-interactive-videoquiz', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        load_plugin_textdomain('lucrative-interactive-video', false, dirname(plugin_basename(__FILE__)) . '/languages');
         
         // Initialize components
         $this->load_dependencies();
@@ -133,7 +133,7 @@ class LucrativeInteractiveVideoQuiz {
      */
     public function add_settings_link(array $links) {
         $settings_url = admin_url('admin.php?page=livq-dashboard');
-        $settings_link = '<a href="' . esc_url($settings_url) . '">' . esc_html__('Settings', 'lucrative-interactive-videoquiz') . '</a>';
+        $settings_link = '<a href="' . esc_url($settings_url) . '">' . esc_html__('Settings', 'lucrative-interactive-video') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
@@ -146,7 +146,7 @@ class LucrativeInteractiveVideoQuiz {
             return $links;
         }
         $docs_url = admin_url('admin.php?page=livq-dashboard&tab=documentation');
-        $links[] = '<a href="' . esc_url($docs_url) . '">' . esc_html__('Documentation', 'lucrative-interactive-videoquiz') . '</a>';
+        $links[] = '<a href="' . esc_url($docs_url) . '">' . esc_html__('Documentation', 'lucrative-interactive-video') . '</a>';
         return $links;
     }
     
@@ -180,3 +180,4 @@ class LucrativeInteractiveVideoQuiz {
 
 // Initialize the plugin
 new LucrativeInteractiveVideoQuiz();
+

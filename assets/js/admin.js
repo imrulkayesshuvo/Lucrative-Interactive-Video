@@ -48,7 +48,7 @@ jQuery(document).ready(function ($) {
             var questionType = $('#question_type').val();
 
             // Advanced question types that don't use default correct answer field
-            var advancedTypes = ['short_answer', 'fill_blanks', 'match_pair', 'match_image_label', 'drag_drop', 'drag_drop_image', 'sorting'];
+            var advancedTypes = ['short_answer', 'fill_blanks', 'match_pair', 'match_image_label', 'drag_drop'];
 
             // CRITICAL: Remove required attribute from correct_answer for advanced types BEFORE validation
             if (advancedTypes.indexOf(questionType) !== -1) {
@@ -59,14 +59,7 @@ jQuery(document).ready(function ($) {
                 $('#correct-answer-container').closest('.livq-form-group').hide();
             }
 
-            // Custom validation for drag-drop-image
-            if (questionType === 'drag_drop_image') {
-                var imageCount = $('#drag-images-list .drag-image-item').length;
-                if (imageCount === 0) {
-                    alert('Please add at least one image for the drag & drop question.');
-                    return false;
-                }
-            }
+
 
             // Check if form is valid (skip for advanced types that don't use standard fields)
             var isValid = true;
@@ -192,7 +185,7 @@ jQuery(document).ready(function ($) {
             var $correctAnswerGroup = $('#correct-answer-container').closest('.livq-form-group');
 
             // Advanced question types that don't use default correct answer field
-            var advancedTypes = ['short_answer', 'fill_blanks', 'match_pair', 'match_image_label', 'drag_drop', 'drag_drop_image', 'sorting'];
+            var advancedTypes = ['short_answer', 'fill_blanks', 'match_pair', 'match_image_label', 'drag_drop'];
 
             if (advancedTypes.indexOf(type) !== -1) {
                 // Remove required attribute for advanced types to prevent HTML5 validation errors

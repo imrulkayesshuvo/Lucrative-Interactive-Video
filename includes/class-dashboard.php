@@ -147,7 +147,7 @@ class LIVQ_Dashboard {
     public function dashboard_page() {
         // Check user capabilities
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to access this page.', 'lucrative-interactive-videoquiz'));
+            wp_die(esc_html__('You do not have permission to access this page.', 'lucrative-interactive-video'));
         }
         
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for tab navigation, capability check above
@@ -257,12 +257,12 @@ class LIVQ_Dashboard {
                         <h3><?php 
                             if ($is_questions_unlimited) {
                                 echo esc_html($questions_count);
-                                echo ' <span class="livq-unlimited-badge"><span class="livq-infinity-icon">∞</span> ' . esc_html__('Unlimited', 'lucrative-interactive-videoquiz') . '</span>';
+                                echo ' <span class="livq-unlimited-badge"><span class="livq-infinity-icon">∞</span> ' . esc_html__('Unlimited', 'lucrative-interactive-video') . '</span>';
                             } else {
                                 echo esc_html($questions_count) . ' / ' . esc_html($max_questions);
                             }
                         ?></h3>
-                        <p><?php echo $is_questions_unlimited ? esc_html__('Questions', 'lucrative-interactive-videoquiz') : esc_html__('Questions (Free Limit)', 'lucrative-interactive-videoquiz'); ?></p>
+                        <p><?php echo $is_questions_unlimited ? esc_html__('Questions', 'lucrative-interactive-video') : esc_html__('Questions (Free Limit)', 'lucrative-interactive-video'); ?></p>
                         <?php if (!$is_questions_unlimited && $questions_count >= $max_questions): ?>
                             <div class="livq-limit-reached">⚠️ Limit Reached</div>
                         <?php endif; ?>
@@ -277,12 +277,12 @@ class LIVQ_Dashboard {
                         <h3><?php 
                             if ($is_videos_unlimited) {
                                 echo esc_html($quizzes_count);
-                                echo ' <span class="livq-unlimited-badge"><span class="livq-infinity-icon">∞</span> ' . esc_html__('Unlimited', 'lucrative-interactive-videoquiz') . '</span>';
+                                echo ' <span class="livq-unlimited-badge"><span class="livq-infinity-icon">∞</span> ' . esc_html__('Unlimited', 'lucrative-interactive-video') . '</span>';
                             } else {
                                 echo esc_html($quizzes_count) . ' / ' . esc_html($max_videos);
                             }
                         ?></h3>
-                        <p><?php echo $is_videos_unlimited ? esc_html__('Video Quizzes', 'lucrative-interactive-videoquiz') : esc_html__('Video Quizzes (Free Limit)', 'lucrative-interactive-videoquiz'); ?></p>
+                        <p><?php echo $is_videos_unlimited ? esc_html__('Video Quizzes', 'lucrative-interactive-video') : esc_html__('Video Quizzes (Free Limit)', 'lucrative-interactive-video'); ?></p>
                         <?php if (!$is_videos_unlimited && $quizzes_count >= $max_videos): ?>
                             <div class="livq-limit-reached">⚠️ Limit Reached</div>
                         <?php endif; ?>
@@ -344,7 +344,7 @@ class LIVQ_Dashboard {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for action, capability check below
         if (isset($_GET['action'])) {
             if (!current_user_can('manage_options')) {
-                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
             }
         }
         
@@ -393,8 +393,8 @@ class LIVQ_Dashboard {
                                 <?php 
                                 // Get question type label from filter (allows PRO addon to add custom types)
                                 $question_types = apply_filters('livq_question_types', array(
-                                    'true_false' => __('True/False', 'lucrative-interactive-videoquiz'),
-                                    'multiple_choice' => __('Multiple Choice', 'lucrative-interactive-videoquiz')
+                                    'true_false' => __('True/False', 'lucrative-interactive-video'),
+                                    'multiple_choice' => __('Multiple Choice', 'lucrative-interactive-video')
                                 ));
                                 
                                 // If type is empty, try to detect from correct_answer structure
@@ -405,8 +405,6 @@ class LIVQ_Dashboard {
                                         $first_key = key($decoded);
                                         if (is_string($first_key) && (strpos($first_key, 'http://') === 0 || strpos($first_key, 'https://') === 0 || strpos($first_key, '/') === 0)) {
                                             $question->type = 'match_image_label';
-                                        } elseif (isset($decoded[0]) && is_array($decoded[0]) && isset($decoded[0]['url'])) {
-                                            $question->type = 'drag_drop_image';
                                         } elseif (is_array($decoded) && !isset($decoded[0])) {
                                             $question->type = 'match_pair';
                                         }
@@ -415,7 +413,7 @@ class LIVQ_Dashboard {
                                 
                                 $type_label = isset($question_types[$question->type]) ? $question_types[$question->type] : ucfirst(str_replace('_', ' ', $question->type));
                                 if (empty($type_label)) {
-                                    $type_label = __('Unknown', 'lucrative-interactive-videoquiz');
+                                    $type_label = __('Unknown', 'lucrative-interactive-video');
                                 }
                                 ?>
                                 <span class="livq-badge livq-badge-<?php echo esc_attr($question->type ?: 'unknown'); ?>">
@@ -434,8 +432,6 @@ class LIVQ_Dashboard {
                                         $first_key = key($decoded);
                                         if (is_string($first_key) && (strpos($first_key, 'http://') === 0 || strpos($first_key, 'https://') === 0 || strpos($first_key, '/') === 0 || strpos($first_key, 'HTTP') === 0)) {
                                             $question->type = 'match_image_label';
-                                        } elseif (isset($decoded[0]) && is_array($decoded[0]) && isset($decoded[0]['url'])) {
-                                            $question->type = 'drag_drop_image';
                                         } elseif (is_array($decoded) && !isset($decoded[0]) && !is_numeric($first_key)) {
                                             $question->type = 'match_pair';
                                         }
@@ -445,6 +441,7 @@ class LIVQ_Dashboard {
                                 if ($question->type === 'true_false') {
                                     $answer_text = $correct_answer === 'true' ? 'True' : 'False';
                                     $answer_class = $correct_answer === 'true' ? 'livq-answer-true' : 'livq-answer-false';
+                                    echo '<span class="livq-correct-answer ' . esc_attr($answer_class) . '">' . esc_html($answer_text) . '</span>';
                                 } else if ($question->type === 'multiple_choice') {
                                     $options = json_decode($question->options, true);
                                     if ($options && isset($options[$correct_answer])) {
@@ -454,48 +451,50 @@ class LIVQ_Dashboard {
                                         $answer_text = 'Option ' . ($correct_answer + 1);
                                         $answer_class = 'livq-answer-choice';
                                     }
-                                } else if ($question->type === 'drag_drop_image') {
-                                    $images = json_decode($correct_answer, true);
-                                    if (is_array($images) && !empty($images)) {
-                                        $image_count = count($images);
-                                        echo '<div class="livq-drag-drop-preview">';
-                                        echo '<span class="livq-image-count-badge">' . esc_html($image_count) . ' ' . _n('image', 'images', $image_count, 'lucrative-interactive-videoquiz') . '</span>';
-                                        echo '<div class="livq-image-thumbnails" style="display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap;">';
-                                        foreach (array_slice($images, 0, 4) as $index => $image) {
-                                            if (isset($image['url'])) {
-                                                echo '<img src="' . esc_url($image['url']) . '" alt="Image ' . ($index + 1) . '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">';
-                                            }
-                                        }
-                                        if (count($images) > 4) {
-                                            echo '<span style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 4px; font-size: 12px; color: #666;">+' . (count($images) - 4) . '</span>';
-                                        }
-                                        echo '</div>';
-                                        echo '</div>';
-                                } else {
-                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html__('No images', 'lucrative-interactive-videoquiz') . '</span>';
-                                    }
-                                } else if ($question->type === 'drag_drop' || $question->type === 'sorting') {
+                                    echo '<span class="livq-correct-answer ' . esc_attr($answer_class) . '">' . esc_html($answer_text) . '</span>';
+                                } else if ($question->type === 'drag_drop') {
                                     $items = json_decode($correct_answer, true);
                                     if (is_array($items) && !empty($items)) {
                                         $item_count = count($items);
-                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html($item_count) . ' ' . _n('item', 'items', $item_count, 'lucrative-interactive-videoquiz') . '</span>';
+                                        echo '<div class="livq-drag-drop-preview" style="display: flex; flex-direction: column; gap: 2px;">';
+                                        foreach (array_slice($items, 0, 3) as $index => $item) {
+                                            $label = is_array($item) ? ($item['label'] ?? 'Item ' . ($index+1)) : $item;
+                                            echo '<div style="font-size: 11px; background: #fdf2f8; padding: 2px 6px; border-radius: 4px; border: 1px solid #fbcfe8; color: #be185d;">';
+                                            echo ($index + 1) . '. ' . esc_html($label);
+                                            echo '</div>';
+                                        }
+                                        if (count($items) > 3) {
+                                            echo '<div style="font-size: 10px; color: #666; padding-left: 6px;">+ ' . (count($items) - 3) . ' ' . esc_html__('more...', 'lucrative-interactive-video') . '</div>';
+                                        }
+                                        echo '</div>';
                                     } else {
-                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html__('No items', 'lucrative-interactive-videoquiz') . '</span>';
+                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html__('No items', 'lucrative-interactive-video') . '</span>';
                                     }
                                 } else if ($question->type === 'match_pair') {
                                     $pairs = json_decode($correct_answer, true);
                                     if (is_array($pairs) && !empty($pairs)) {
-                                        $pair_count = count($pairs);
-                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html($pair_count) . ' ' . _n('pair', 'pairs', $pair_count, 'lucrative-interactive-videoquiz') . '</span>';
+                                        echo '<div class="livq-match-pairs-preview" style="display: flex; flex-direction: column; gap: 2px;">';
+                                        $index = 0;
+                                        foreach ($pairs as $left => $right) {
+                                            if ($index >= 3) break;
+                                            echo '<div style="font-size: 12px; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e7ff; color: #0056b3;">';
+                                            echo esc_html($left) . ' <span style="color: #666; font-size: 10px;">→</span> ' . esc_html($right);
+                                            echo '</div>';
+                                            $index++;
+                                        }
+                                        if (count($pairs) > 3) {
+                                            echo '<div style="font-size: 10px; color: #666; padding-left: 6px;">+ ' . (count($pairs) - 3) . ' ' . esc_html__('more...', 'lucrative-interactive-video') . '</div>';
+                                        }
+                                        echo '</div>';
                                     } else {
-                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html__('No pairs', 'lucrative-interactive-videoquiz') . '</span>';
-                                }
+                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html__('No pairs', 'lucrative-interactive-video') . '</span>';
+                                    }
                                 } else if ($question->type === 'match_image_label') {
                                     $pairs = json_decode($correct_answer, true);
                                     if (is_array($pairs) && !empty($pairs)) {
                                         $pair_count = count($pairs);
                                         echo '<div class="livq-drag-drop-preview">';
-                                        echo '<span class="livq-image-count-badge">' . esc_html($pair_count) . ' ' . _n('image', 'images', $pair_count, 'lucrative-interactive-videoquiz') . '</span>';
+                                        echo '<span class="livq-image-count-badge">' . esc_html($pair_count) . ' ' . _n('image', 'images', $pair_count, 'lucrative-interactive-video') . '</span>';
                                         echo '<div class="livq-image-thumbnails" style="display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap;">';
                                         $index = 0;
                                         foreach ($pairs as $image_url => $label) {
@@ -512,12 +511,16 @@ class LIVQ_Dashboard {
                                         echo '</div>';
                                         echo '</div>';
                                     } else {
-                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html__('No images', 'lucrative-interactive-videoquiz') . '</span>';
+                                        echo '<span class="livq-correct-answer livq-answer-default">' . esc_html__('No images', 'lucrative-interactive-video') . '</span>';
                                     }
                                 } else if ($question->type === 'fill_blanks') {
                                     $answers = json_decode($correct_answer, true);
-                                    if (is_array($answers)) {
-                                        echo '<span class="livq-correct-answer livq-answer-default" title="' . esc_attr(implode(', ', $answers)) . '">' . esc_html(count($answers)) . ' ' . _n('answer', 'answers', count($answers), 'lucrative-interactive-videoquiz') . '</span>';
+                                    if (is_array($answers) && !empty($answers)) {
+                                        echo '<div class="livq-blanks-preview" style="display: flex; flex-wrap: wrap; gap: 4px;">';
+                                        foreach ($answers as $index => $ans) {
+                                            echo '<span style="font-size: 11px; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #a7f3d0; color: #065f46; font-weight: 600;">' . esc_html($ans) . '</span>';
+                                        }
+                                        echo '</div>';
                                     } else {
                                         echo '<span class="livq-correct-answer livq-answer-default">' . esc_html(substr($correct_answer, 0, 50)) . (strlen($correct_answer) > 50 ? '...' : '') . '</span>';
                                     }
@@ -551,7 +554,7 @@ class LIVQ_Dashboard {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for ID, capability check below
         if ($action === 'edit' && isset($_GET['id'])) {
             if (!current_user_can('manage_options')) {
-                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
             }
         }
         
@@ -585,8 +588,8 @@ class LIVQ_Dashboard {
                     <?php
                     // Allow PRO addon to add more question types
                     $question_types = apply_filters('livq_question_types', array(
-                        'true_false' => __('True/False', 'lucrative-interactive-videoquiz'),
-                        'multiple_choice' => __('Multiple Choice', 'lucrative-interactive-videoquiz')
+                        'true_false' => __('True/False', 'lucrative-interactive-video'),
+                        'multiple_choice' => __('Multiple Choice', 'lucrative-interactive-video')
                     ));
                     
                     foreach ($question_types as $type_value => $type_label):
@@ -693,7 +696,7 @@ class LIVQ_Dashboard {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for action, capability check below
         if (isset($_GET['action'])) {
             if (!current_user_can('manage_options')) {
-                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
             }
         }
         
@@ -772,7 +775,7 @@ class LIVQ_Dashboard {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for ID, capability check below
         if ($action === 'edit' && isset($_GET['id'])) {
             if (!current_user_can('manage_options')) {
-                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+                wp_die(esc_html__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
             }
         }
         
@@ -1305,7 +1308,7 @@ class LIVQ_Dashboard {
     public function save_question() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         global $wpdb;
@@ -1324,10 +1327,10 @@ class LIVQ_Dashboard {
         
         // Validate required fields
         if (empty($title)) {
-            wp_send_json_error(__('Question title is required.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Question title is required.', 'lucrative-interactive-video'));
         }
         if (empty($type)) {
-            wp_send_json_error(__('Question type is required.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Question type is required.', 'lucrative-interactive-video'));
         }
         
         $options = null;
@@ -1347,45 +1350,15 @@ class LIVQ_Dashboard {
         $correct_answer = isset($_POST['correct_answer']) ? sanitize_text_field(wp_unslash($_POST['correct_answer'])) : '';
         $explanation = isset($_POST['explanation']) ? sanitize_textarea_field(wp_unslash($_POST['explanation'])) : '';
         
-        // Process drag-drop-image type
-        if ($type === 'drag_drop_image') {
-            if (!isset($_POST['drag_image_urls']) || !is_array($_POST['drag_image_urls']) || empty($_POST['drag_image_urls'])) {
-                wp_send_json_error(__('Please add at least one image for the drag & drop question.', 'lucrative-interactive-videoquiz'));
-            }
-            
-            $drag_images = array();
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in loop below
-            $urls = wp_unslash($_POST['drag_image_urls']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in loop below
-            $ids = isset($_POST['drag_image_ids']) && is_array($_POST['drag_image_ids']) ? wp_unslash($_POST['drag_image_ids']) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in loop below
-            $labels = isset($_POST['drag_image_labels']) && is_array($_POST['drag_image_labels']) ? wp_unslash($_POST['drag_image_labels']) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-            
-            foreach ($urls as $index => $url) {
-                if (empty($url)) {
-                    continue; // Skip empty URLs
-                }
-                $drag_images[] = array(
-                    'id' => isset($ids[$index]) ? intval($ids[$index]) : 0,
-                    'url' => esc_url_raw($url),
-                    'label' => isset($labels[$index]) ? sanitize_text_field($labels[$index]) : ''
-                );
-            }
-            
-            if (empty($drag_images)) {
-                wp_send_json_error(__('Please add at least one valid image for the drag & drop question.', 'lucrative-interactive-videoquiz'));
-            }
-            
-            $correct_answer = wp_json_encode($drag_images);
-        }
+
         
         // Process match-image-label type (basic validation - full processing in PRO addon)
         if ($type === 'match_image_label') {
             if (!isset($_POST['match_image_urls']) || !is_array($_POST['match_image_urls']) || empty($_POST['match_image_urls'])) {
-                wp_send_json_error(__('Please add at least one image for the match image to label question.', 'lucrative-interactive-videoquiz'));
+                wp_send_json_error(__('Please add at least one image for the match image to label question.', 'lucrative-interactive-video'));
             }
             if (!isset($_POST['match_image_labels']) || !is_array($_POST['match_image_labels']) || empty($_POST['match_image_labels'])) {
-                wp_send_json_error(__('Please add labels for all images.', 'lucrative-interactive-videoquiz'));
+                wp_send_json_error(__('Please add labels for all images.', 'lucrative-interactive-video'));
             }
         }
         
@@ -1436,13 +1409,13 @@ class LIVQ_Dashboard {
     public function delete_question() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         global $wpdb;
         $question_id = isset($_POST['question_id']) ? intval($_POST['question_id']) : 0;
         if ($question_id <= 0) {
-            wp_send_json_error(__('Invalid question ID.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Invalid question ID.', 'lucrative-interactive-video'));
         }
         
         $wpdb->delete($wpdb->prefix . 'livq_questions', array('id' => $question_id));
@@ -1453,7 +1426,7 @@ class LIVQ_Dashboard {
     public function save_video_quiz() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         global $wpdb;
@@ -1491,7 +1464,7 @@ class LIVQ_Dashboard {
             }
             if ($tutor_lms_lesson <= 0) {
                 error_log('ERROR: No Tutor LMS lesson selected');
-                wp_send_json_error(__('Please select a Tutor LMS lesson.', 'lucrative-interactive-videoquiz'));
+                wp_send_json_error(__('Please select a Tutor LMS lesson.', 'lucrative-interactive-video'));
             }
             $video_url = strval($tutor_lms_lesson); // Store lesson ID as string
             error_log('Final video_url (lesson ID): ' . $video_url);
@@ -1606,13 +1579,13 @@ class LIVQ_Dashboard {
     public function delete_video_quiz() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         global $wpdb;
         $quiz_id = isset($_POST['quiz_id']) ? intval($_POST['quiz_id']) : 0;
         if ($quiz_id <= 0) {
-            wp_send_json_error(__('Invalid quiz ID.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Invalid quiz ID.', 'lucrative-interactive-video'));
         }
         
         $wpdb->delete($wpdb->prefix . 'livq_video_quizzes', array('id' => $quiz_id));
@@ -1623,7 +1596,7 @@ class LIVQ_Dashboard {
     public function save_settings() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         $settings = array(
@@ -1641,7 +1614,7 @@ class LIVQ_Dashboard {
     public function get_questions() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         global $wpdb;
@@ -1664,23 +1637,23 @@ class LIVQ_Dashboard {
     public function get_tutor_lms_video() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         if (!function_exists('tutor_utils')) {
-            wp_send_json_error(__('Tutor LMS is not installed or activated.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Tutor LMS is not installed or activated.', 'lucrative-interactive-video'));
         }
         
         $lesson_id = isset($_POST['lesson_id']) ? intval($_POST['lesson_id']) : 0;
         if ($lesson_id <= 0) {
-            wp_send_json_error(__('Invalid lesson ID.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Invalid lesson ID.', 'lucrative-interactive-video'));
         }
         
         // Get video data from Tutor LMS
         $video = tutor_utils()->get_video($lesson_id);
         
         if (!$video || empty($video)) {
-            wp_send_json_error(__('This lesson does not have a video.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('This lesson does not have a video.', 'lucrative-interactive-video'));
         }
         
         $video_source = isset($video['source']) ? $video['source'] : '';
@@ -1698,7 +1671,7 @@ class LIVQ_Dashboard {
         }
         
         if (empty($video_url)) {
-            wp_send_json_error(__('Could not extract video URL from lesson.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Could not extract video URL from lesson.', 'lucrative-interactive-video'));
         }
         
         wp_send_json_success(array(
@@ -1712,7 +1685,7 @@ class LIVQ_Dashboard {
     public function get_video_duration() {
         check_ajax_referer('livq_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('You do not have permission to perform this action.', 'lucrative-interactive-video'));
         }
         
         $video_url = isset($_POST['video_url']) ? sanitize_url(wp_unslash($_POST['video_url'])) : '';
@@ -2075,3 +2048,4 @@ class LIVQ_Dashboard {
         <?php
     }
 }
+

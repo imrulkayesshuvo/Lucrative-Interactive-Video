@@ -89,8 +89,6 @@ class LIVQ_Question_Manager {
                 // Check if it's an associative array with URLs as keys (match_image_label)
                 if (is_string($first_key) && (strpos($first_key, 'http://') === 0 || strpos($first_key, 'https://') === 0 || strpos($first_key, '/') === 0 || strpos(strtoupper($first_key), 'HTTP') === 0)) {
                     $detected_type = 'match_image_label';
-                } elseif (isset($decoded[0]) && is_array($decoded[0]) && isset($decoded[0]['url'])) {
-                    $detected_type = 'drag_drop_image';
                 } elseif (is_array($decoded) && !isset($decoded[0]) && !is_numeric($first_key)) {
                     $detected_type = 'match_pair';
                 }

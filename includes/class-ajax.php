@@ -39,7 +39,7 @@ class LIVQ_Ajax {
         $user_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
         
         if ($quiz_id <= 0) {
-            wp_send_json_error(__('Invalid quiz ID.', 'lucrative-interactive-videoquiz'));
+            wp_send_json_error(__('Invalid quiz ID.', 'lucrative-interactive-video'));
         }
         
         // Sanitize answers payload: ensure array of questionId => answer
@@ -153,3 +153,4 @@ class LIVQ_Ajax {
         return false;
     }
 }
+

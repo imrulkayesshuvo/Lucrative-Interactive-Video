@@ -119,7 +119,7 @@ class LIVQ_Database {
         if ($type_info && strpos(strtolower($type_info->COLUMN_TYPE), 'enum') !== false) {
             // Check if new types are already in the enum - check for match_image_label specifically
             $enum_values = strtolower($type_info->COLUMN_TYPE);
-            if (strpos($enum_values, 'match_image_label') === false || strpos($enum_values, 'drag_drop_image') === false) {
+            if (strpos($enum_values, 'match_image_label') === false) {
                 // Update enum to include all new question types
                 $wpdb->query("ALTER TABLE {$questions_table} MODIFY COLUMN type ENUM(
                     'true_false',
@@ -128,9 +128,7 @@ class LIVQ_Database {
                     'fill_blanks',
                     'match_pair',
                     'match_image_label',
-                    'drag_drop',
-                    'drag_drop_image',
-                    'sorting'
+                    'drag_drop'
                 ) NOT NULL");
             }
         }
@@ -147,8 +145,6 @@ class LIVQ_Database {
                     // Check if it's match_image_label (associative array with URLs as keys)
                     if (is_string($first_key) && (strpos($first_key, 'http://') === 0 || strpos($first_key, 'https://') === 0 || strpos($first_key, '/') === 0 || strpos(strtoupper($first_key), 'HTTP') === 0)) {
                         $detected_type = 'match_image_label';
-                    } elseif (isset($decoded[0]) && is_array($decoded[0]) && isset($decoded[0]['url'])) {
-                        $detected_type = 'drag_drop_image';
                     } elseif (is_array($decoded) && !isset($decoded[0]) && !is_numeric($first_key)) {
                         $detected_type = 'match_pair';
                     }
