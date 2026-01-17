@@ -53,7 +53,13 @@ class LIVQ_Ajax {
                 if (is_array($value) && isset($value['answer'])) {
                     $value = $value['answer'];
                 }
-                $sanitized_answers[$qid] = sanitize_text_field($value);
+                
+                // Fix: Handle array answers (e.g. fill_blanks, match_pair)
+                if (is_array($value)) {
+                    $sanitized_answers[$qid] = $value;
+                } else {
+                    $sanitized_answers[$qid] = sanitize_text_field($value);
+                }
             }
         }
         

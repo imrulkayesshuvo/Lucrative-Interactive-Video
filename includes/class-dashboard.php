@@ -447,7 +447,13 @@ class LIVQ_Dashboard {
                                     $answer_class = $correct_answer === 'true' ? 'livq-answer-true' : 'livq-answer-false';
                                     echo '<span class="livq-correct-answer ' . esc_attr($answer_class) . '">' . esc_html($answer_text) . '</span>';
                                 } else if ($question->type === 'short_answer') {
-                                    echo '<span class="livq-correct-answer livq-answer-choice">' . esc_html($correct_answer) . '</span>';
+                                    $display_answer = $correct_answer;
+                                    // Try to decode if it looks like JSON array (legacy or future proof)
+                                    $decoded = json_decode($correct_answer, true);
+                                    if (is_array($decoded)) {
+                                        $display_answer = implode(' OR ', $decoded);
+                                    }
+                                    echo '<span class="livq-correct-answer livq-answer-choice">' . esc_html($display_answer) . '</span>';
                                 } else if ($question->type === 'multiple_choice') {
                                     $options = json_decode($question->options, true);
                                     if ($options && isset($options[$correct_answer])) {
@@ -1309,6 +1315,7 @@ class LIVQ_Dashboard {
                             <th>User</th>
                             <th>Score</th>
                             <th>Completed</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1325,12 +1332,111 @@ class LIVQ_Dashboard {
                             </td>
                     <td><?php echo esc_html(intval($result->score)); ?>/<?php echo esc_html(intval($result->total_questions)); ?></td>
                             <td><?php echo esc_html(gmdate('M j, Y H:i', strtotime($result->completed_at))); ?></td>
+                            <td>
+                                <button type="button" class="button button-small livq-view-report-details" 
+                                    data-answers="<?php echo esc_attr($result->answers); ?>"
+                                    data-score="<?php echo esc_attr(intval($result->score) . '/' . intval($result->total_questions)); ?>"
+                                    data-user="<?php echo esc_attr($result->user_id ? (get_user_by('id', $result->user_id) ? get_user_by('id', $result->user_id)->display_name : 'Unknown') : 'Guest'); ?>">
+                                    View Details
+                                </button>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-        </div>
+            
+            <!-- Report Details Modal Script -->
+            <script>
+            jQuery(document).ready(function($) {
+                $('.livq-view-report-details').on('click', function() {
+                    var answersData = $(this).data('answers');
+                    // Check if it's already an object or needs parsing (data attr automatically parses JSON sometimes, but good to be checking)
+                    var answers = typeof answersData === 'string' ? JSON.parse(answersData) : answersData;
+                    var score = $(this).data('score');
+                    var user = $(this).data('user');
+                    
+                    var html = '<div class="livq-report-summary" style="margin-bottom:20px; padding:15px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">';
+                    html += '<strong>User:</strong> ' + user + ' &nbsp;|&nbsp; <strong>Score:</strong> ' + score;
+                    html += '</div>';
+                    
+                    html += '<div class="livq-report-details-list" style="display:flex; flex-direction:column; gap:15px;">';
+                    
+                    if (answers) {
+                        $.each(answers, function(qid, data) {
+                             var isCorrect = data.is_correct === true || data.is_correct === "true" || data.is_correct === 1;
+                             var statusColor = isCorrect ? '#ecfdf5' : '#fef2f2';
+                             var borderColor = isCorrect ? '#10b981' : '#ef4444';
+                             var icon = isCorrect ? '✓' : '✗';
+                             
+                             var userAnsDisplay = data.user_answer;
+                             if (Array.isArray(userAnsDisplay)) userAnsDisplay = userAnsDisplay.join(', ');
+                             else if (typeof userAnsDisplay === 'object' && userAnsDisplay !== null) userAnsDisplay = JSON.stringify(userAnsDisplay);
+                             
+                             var correctAnsDisplay = data.correct_answer;
+                             try {
+                                 var parsed = JSON.parse(correctAnsDisplay);
+                                 if (Array.isArray(parsed)) correctAnsDisplay = parsed.join(', ');
+                                 else if (typeof parsed === 'object') {
+                                     // For match types, nicely format objects
+                                     correctAnsDisplay = JSON.stringify(parsed);
+                                     if (Object.keys(parsed).length > 0 && !Array.isArray(parsed)) {
+                                         var pairs = [];
+                                         $.each(parsed, function(k, v) { pairs.push(k + ' → ' + v); });
+                                         correctAnsDisplay = pairs.join('; ');
+                                     }
+                                 } else correctAnsDisplay = parsed;
+                             } catch(e) {}
+
+                             html += '<div style="background:white; border:1px solid '+borderColor+'; border-radius:8px; padding:15px; border-left:5px solid '+borderColor+';">';
+                             html += '<div style="font-weight:bold; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">Question ID: ' + qid + ' <span style="float:right; font-size:1.2em; color:'+borderColor+'">' + icon + '</span></div>';
+                             html += '<div style="margin-bottom:5px;"><strong>Your Answer:</strong> <span style="color:'+(isCorrect?'#047857':'#b91c1c')+'">' + (userAnsDisplay || '<span style="color:#ccc; font-style:italic;">No Answer</span>') + '</span></div>';
+                             
+                             if (!isCorrect) {
+                                 html += '<div style="font-size:0.9em; color:#64748b; margin-top:5px; padding-top:5px; border-top:1px dashed #eee;"><strong>Correct Answer:</strong> ' + correctAnsDisplay + '</div>';
+                             }
+                             if (data.explanation) {
+                                 html += '<div style="margin-top:8px; font-size:0.85em; background:#f1f5f9; padding:8px; border-radius:4px;"><strong>Explanation:</strong> ' + data.explanation + '</div>';
+                             }
+                             html += '</div>';
+                        });
+                    } else {
+                        html += '<p>No detailed answer data available for this attempt.</p>';
+                    }
+                    html += '</div>';
+                    
+                    // Cleanup old overlays
+                    $('.livq-admin-modal-overlay').remove();
+                    
+                    // Modal Overlay
+                    var $overlay = $('<div class="livq-admin-modal-overlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px);"></div>');
+                    
+                    // Modal Content
+                    var $modal = $('<div class="livq-admin-modal" style="background:white; width:700px; max-width:90%; max-height:85vh; overflow-y:auto; padding:0; border-radius:12px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); position:relative; display:flex; flex-direction:column;"></div>');
+                    
+                    // Header
+                    $modal.append('<div style="padding:20px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:white; z-index:10;"><h3 style="margin:0; font-size:1.25rem; color:#1e293b;">Attempt Details</h3><button type="button" class="livq-close-modal" style="border:none; background:none; font-size:24px; cursor:pointer; color:#64748b;">&times;</button></div>');
+                    
+                    // Body
+                    $modal.append('<div style="padding:25px;">' + html + '</div>');
+                    
+                    $overlay.append($modal);
+                    $('body').append($overlay);
+                    $('body').css('overflow', 'hidden'); // Prevent scroll
+                    
+                    $overlay.on('click', function(e) {
+                        if (e.target === this) {
+                            $(this).remove();
+                            $('body').css('overflow', '');
+                        }
+                    });
+                    $('.livq-close-modal').on('click', function() {
+                        $('.livq-admin-modal-overlay').remove();
+                        $('body').css('overflow', '');
+                    });
+                });
+            });
+            </script>
         <?php
     }
     

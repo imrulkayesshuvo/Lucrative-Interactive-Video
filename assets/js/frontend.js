@@ -426,6 +426,9 @@ jQuery(document).ready(function ($) {
             html += '</ul>';
         } else if (question.type === 'short_answer') {
             html += '<div class="livq-short-answer-container">';
+            html += '<div class="livq-question-instruction" style="background: #eef2ff; color: #4338ca; padding: 12px 15px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; border-left: 5px solid #6366f1;">';
+            html += '<strong>Instruction:</strong> Type your answer in the box below.';
+            html += '</div>';
             html += '<input type="text" class="livq-short-answer-input" name="answer_custom" placeholder="Type your answer here" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; margin-top: 10px;">';
             html += '</div>';
         } else if (question.type === 'fill_blanks') {
@@ -1706,6 +1709,61 @@ jQuery(document).ready(function ($) {
         // Remove any existing feedback
         $container.find('.livq-question-feedback').remove();
 
+        // Special handling for fill_blanks to show partial correctness
+        if (question.type === 'fill_blanks') {
+            var correctAnswers = [];
+            try {
+                correctAnswers = JSON.parse(question.correct_answer);
+            } catch (e) { }
+
+            var hasSomeCorrect = false;
+            var totalBlanks = correctAnswers.length;
+            var correctCount = 0;
+
+            $container.find('.livq-blank-input').each(function (index) {
+                var userVal = $(this).val();
+                var correctVal = correctAnswers[index];
+
+                // Remove old classes
+                $(this).removeClass('livq-correct-input livq-incorrect-input');
+
+                if (String(userVal).trim().toLowerCase() === String(correctVal).trim().toLowerCase()) {
+                    $(this).addClass('livq-correct-input');
+                    $(this).css({
+                        'border': '2px solid #10b981',
+                        'background-color': '#ecfdf5',
+                        'color': '#064e3b'
+                    });
+                    hasSomeCorrect = true;
+                    correctCount++;
+                } else {
+                    $(this).addClass('livq-incorrect-input');
+                    $(this).css({
+                        'border': '2px solid #ef4444',
+                        'background-color': '#fef2f2',
+                        'color': '#991b1b'
+                    });
+                }
+            });
+
+            // Modify feedback text if partially correct (and not fully correct)
+            if (!isCorrect && hasSomeCorrect) {
+                var feedbackHtml = '<div class="livq-question-feedback partially-correct" style="background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; padding: 15px; border-radius: 8px; margin-top: 20px;">';
+                feedbackHtml += '<strong>⚠️ Partially Correct (' + correctCount + '/' + totalBlanks + ')</strong>';
+
+                if (question.explanation) {
+                    feedbackHtml += '<div class="explanation">' + question.explanation + '</div>';
+                }
+
+                var ans = correctAnswers;
+                feedbackHtml += '<div class="correct-answer">Correct answer: <span style="font-weight:600;">' + ans.join(', ') + '</span></div>';
+                feedbackHtml += '</div>';
+
+                $container.append(feedbackHtml);
+                return;
+            }
+        }
+
         var feedbackClass = isCorrect ? 'correct' : 'incorrect';
         var feedbackIcon = isCorrect ? '✓' : '✗';
         var feedbackText = isCorrect ? 'Correct!' : 'Incorrect';
@@ -1729,26 +1787,44 @@ jQuery(document).ready(function ($) {
 
     function checkAnswer(question, userAnswer) {
         if (question.type === 'true_false') {
-            return userAnswer === question.correct_answer;
+            return String(userAnswer).toLowerCase() === String(question.correct_answer).toLowerCase();
         } else if (question.type === 'multiple_choice') {
             return userAnswer == question.correct_answer;
         } else if (question.type === 'short_answer') {
-            // Basic client-side check, ideally server-side or more robust
-            var correct = JSON.parse(question.correct_answer);
-            if (Array.isArray(correct)) {
-                return correct.some(ans => ans.toLowerCase().trim() === userAnswer.toLowerCase().trim());
+            // Short answer is stored as plain text, but might be a JSON array if multiple valid answers are allowed (future proofing)
+            var correct = question.correct_answer;
+            try {
+                var parsed = JSON.parse(correct);
+                if (Array.isArray(parsed)) {
+                    return parsed.some(ans => ans.toLowerCase().trim() === userAnswer.toLowerCase().trim());
+                }
+                correct = parsed; // Use parsed value if it was a valid JSON string
+            } catch (e) {
+                // Not JSON, treat as plain text
             }
-            return correct.toLowerCase().trim() === userAnswer.toLowerCase().trim();
+            return String(correct).toLowerCase().trim() === String(userAnswer).toLowerCase().trim();
         } else if (question.type === 'fill_blanks') {
             // userAnswer is array of strings
-            var correct = JSON.parse(question.correct_answer);
-            if (!Array.isArray(userAnswer) || userAnswer.length !== correct.length) return false;
+            var correct;
+            try {
+                correct = JSON.parse(question.correct_answer);
+            } catch (e) {
+                return false; // Invalid correct answer data
+            }
+
+            if (!Array.isArray(userAnswer) || !Array.isArray(correct) || userAnswer.length !== correct.length) return false;
             for (var i = 0; i < correct.length; i++) {
-                if (userAnswer[i].toLowerCase().trim() !== correct[i].toLowerCase().trim()) return false;
+                if (String(userAnswer[i]).toLowerCase().trim() !== String(correct[i]).toLowerCase().trim()) return false;
             }
             return true;
         } else if (question.type === 'drag_drop') {
-            var correct = JSON.parse(question.correct_answer);
+            var correct;
+            try {
+                correct = JSON.parse(question.correct_answer);
+            } catch (e) {
+                return false;
+            }
+
             if (!Array.isArray(userAnswer) || !Array.isArray(correct)) return false;
             if (userAnswer.length !== correct.length) return false;
 
@@ -1762,7 +1838,12 @@ jQuery(document).ready(function ($) {
 
         } else if (question.type === 'match_pair' || question.type === 'match_image_label') {
             // userAnswer is an object: { leftValue: rightValue }
-            var correct = JSON.parse(question.correct_answer);
+            var correct;
+            try {
+                correct = JSON.parse(question.correct_answer);
+            } catch (e) {
+                return false;
+            }
 
             // Check if all correct pairs are present in user answer
             var correctKeys = Object.keys(correct);
@@ -1772,7 +1853,7 @@ jQuery(document).ready(function ($) {
 
             for (var key in correct) {
                 if (correct.hasOwnProperty(key)) {
-                    if (!userAnswer[key] || userAnswer[key].toLowerCase().trim() !== correct[key].toLowerCase().trim()) {
+                    if (!userAnswer[key] || String(userAnswer[key]).toLowerCase().trim() !== String(correct[key]).toLowerCase().trim()) {
                         return false;
                     }
                 }
@@ -1791,8 +1872,17 @@ jQuery(document).ready(function ($) {
                 return question.options[correctIndex];
             }
         } else if (question.type === 'short_answer') {
-            var ans = JSON.parse(question.correct_answer);
-            return Array.isArray(ans) ? ans.join(' OR ') : ans;
+            var ans = question.correct_answer;
+            try {
+                var parsed = JSON.parse(ans);
+                if (Array.isArray(parsed)) {
+                    return parsed.join(' OR ');
+                }
+                ans = parsed;
+            } catch (e) {
+                // Not JSON, treat as plain text
+            }
+            return ans;
         } else if (question.type === 'fill_blanks') {
             var ans = JSON.parse(question.correct_answer);
             return ans.join(', ');
