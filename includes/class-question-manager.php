@@ -101,7 +101,8 @@ class LIVQ_Question_Manager {
             'type' => $detected_type ?: $question->type,
             'options' => ($detected_type ?: $question->type) === 'multiple_choice' ? json_decode($question->options, true) : null,
             'correct_answer' => $question->correct_answer,
-            'explanation' => $question->explanation
+            'explanation' => $question->explanation,
+            'metadata' => !empty($question->metadata) ? json_decode($question->metadata, true) : null
         );
         
         // Handle PRO question types

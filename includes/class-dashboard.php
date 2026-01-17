@@ -52,7 +52,9 @@ class LIVQ_Dashboard {
      */
     public function documentation_page() {
         // Route to the same renderer as documentation tab to keep content in one place
+        echo '<div class="wrap">';
         $this->documentation_tab();
+        echo '</div>';
     }
 
     /**
@@ -153,7 +155,8 @@ class LIVQ_Dashboard {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET request for tab navigation, capability check above
         $current_tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'dashboard';
         ?>
-        <div class="livq-dashboard">
+        <div class="wrap">
+            <div class="livq-dashboard">
             <div class="livq-header">
                 <h1>🎓 Lucrative Interactive VideoQuiz</h1>
                 <p>Make your videos smarter — engage learners with in-video questions</p>
@@ -217,7 +220,8 @@ class LIVQ_Dashboard {
                 </div>
             </div>
         </div>
-        <?php
+    </div>
+    <?php
     }
     
     private function dashboard_tab() {
@@ -442,6 +446,8 @@ class LIVQ_Dashboard {
                                     $answer_text = $correct_answer === 'true' ? 'True' : 'False';
                                     $answer_class = $correct_answer === 'true' ? 'livq-answer-true' : 'livq-answer-false';
                                     echo '<span class="livq-correct-answer ' . esc_attr($answer_class) . '">' . esc_html($answer_text) . '</span>';
+                                } else if ($question->type === 'short_answer') {
+                                    echo '<span class="livq-correct-answer livq-answer-choice">' . esc_html($correct_answer) . '</span>';
                                 } else if ($question->type === 'multiple_choice') {
                                     $options = json_decode($question->options, true);
                                     if ($options && isset($options[$correct_answer])) {
@@ -566,6 +572,12 @@ class LIVQ_Dashboard {
             $question_id = intval($_GET['id']);
             $question = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}livq_questions WHERE id = %d", $question_id));
         }
+
+        $metadata = array();
+        if ($question && !empty($question->metadata)) {
+            $metadata = json_decode($question->metadata, true);
+        }
+        $branching = isset($metadata['branching']) ? $metadata['branching'] : array();
         ?>
         <div class="livq-tab-content">
             <div class="livq-header-actions">
@@ -589,7 +601,8 @@ class LIVQ_Dashboard {
                     // Allow PRO addon to add more question types
                     $question_types = apply_filters('livq_question_types', array(
                         'true_false' => __('True/False', 'lucrative-interactive-video'),
-                        'multiple_choice' => __('Multiple Choice', 'lucrative-interactive-video')
+                        'multiple_choice' => __('Multiple Choice', 'lucrative-interactive-video'),
+                        'short_answer' => __('Short Answer', 'lucrative-interactive-video')
                     ));
                     
                     foreach ($question_types as $type_value => $type_label):
@@ -668,6 +681,23 @@ class LIVQ_Dashboard {
                             <?php endforeach; endif; ?>
                         </select>
                         <?php endif; ?>
+                    </div>
+                </div>
+                
+                <div class="livq-form-group">
+                    <label>Branching Logic (Jump to Time)</label>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e9ecef;">
+                        <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 10px;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 13px; color: #155724;">If Answer is Correct, jump to (sec):</label>
+                                <input type="number" name="metadata[branching][correct_jump]" value="<?php echo isset($branching['correct_jump']) ? esc_attr($branching['correct_jump']) : ''; ?>" placeholder="e.g. 120" min="0">
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 13px; color: #721c24;">If Answer is Incorrect, jump to (sec):</label>
+                                <input type="number" name="metadata[branching][incorrect_jump]" value="<?php echo isset($branching['incorrect_jump']) ? esc_attr($branching['incorrect_jump']) : ''; ?>" placeholder="e.g. 45" min="0">
+                            </div>
+                        </div>
+                        <p class="description">Leave blank to continue playing normally. Destination time is in seconds.</p>
                     </div>
                 </div>
                 
@@ -1362,13 +1392,30 @@ class LIVQ_Dashboard {
             }
         }
         
+        $metadata = '';
+        if (isset($_POST['metadata']) && is_array($_POST['metadata'])) {
+            $raw_metadata = wp_unslash($_POST['metadata']);
+            $sanitized_metadata = array();
+            
+            // Specifically sanitize branching logic if present
+            if (isset($raw_metadata['branching']) && is_array($raw_metadata['branching'])) {
+                $sanitized_metadata['branching'] = array(
+                    'correct_jump' => isset($raw_metadata['branching']['correct_jump']) ? intval($raw_metadata['branching']['correct_jump']) : '',
+                    'incorrect_jump' => isset($raw_metadata['branching']['incorrect_jump']) ? intval($raw_metadata['branching']['incorrect_jump']) : ''
+                );
+            }
+            
+            $metadata = wp_json_encode($sanitized_metadata);
+        }
+        
         // Allow filters to modify data before saving
         $data = apply_filters('livq_before_save_question', array(
             'title' => $title,
             'type' => $type,
             'options' => $options,
             'correct_answer' => $correct_answer,
-            'explanation' => $explanation
+            'explanation' => $explanation,
+            'metadata' => $metadata
         ), $_POST);
         
         if ($question_id) {
@@ -1809,7 +1856,8 @@ class LIVQ_Dashboard {
      */
     public function pro_features_page() {
         ?>
-        <div class="livq-pro-features-page">
+        <div class="wrap">
+            <div class="livq-pro-features-page">
             <div class="livq-pro-header">
                 <div class="livq-pro-hero">
                     <h1>🚀 Upgrade to Pro</h1>
@@ -2045,7 +2093,8 @@ class LIVQ_Dashboard {
                 </div>
             </div>
         </div>
-        <?php
+    </div>
+    <?php
     }
 }
 

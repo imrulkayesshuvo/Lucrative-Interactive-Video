@@ -23,6 +23,7 @@ class LIVQ_Database {
             options longtext,
             correct_answer varchar(255) NOT NULL,
             explanation text,
+            metadata longtext,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
@@ -77,6 +78,16 @@ class LIVQ_Database {
         global $wpdb;
         
         $questions_table = $wpdb->prefix . 'livq_questions';
+        
+        // Add metadata column if not exists
+        $has_metadata = $wpdb->get_var($wpdb->prepare(
+            "SHOW COLUMNS FROM {$questions_table} LIKE %s",
+            'metadata'
+        ));
+        
+        if (!$has_metadata) {
+            $wpdb->query("ALTER TABLE {$questions_table} ADD COLUMN metadata longtext AFTER explanation");
+        }
         
         // Check if table exists
         $table_exists = $wpdb->get_var($wpdb->prepare(

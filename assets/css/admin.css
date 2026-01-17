@@ -2,7 +2,10 @@
 
 .livq-dashboard {
     max-width: 1200px;
-    margin: 20px 0;
+    margin: 20px 0 60px 0;
+    /* Extra bottom margin for footer clearance */
+    position: relative;
+    z-index: 1;
 }
 
 .livq-header {
@@ -33,6 +36,8 @@
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    min-height: 700px;
+    /* Prevent footer overlap */
 }
 
 .livq-sidebar {

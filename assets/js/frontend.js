@@ -1513,7 +1513,17 @@ jQuery(document).ready(function ($) {
             }
         }
 
-        if (nextQuestionId) {
+        // Check for branching logic (Jump to Time)
+        var jumpTime = null;
+        if (currentQuestion.metadata && currentQuestion.metadata.branching) {
+            if (isCorrect && currentQuestion.metadata.branching.correct_jump) {
+                jumpTime = currentQuestion.metadata.branching.correct_jump;
+            } else if (!isCorrect && currentQuestion.metadata.branching.incorrect_jump) {
+                jumpTime = currentQuestion.metadata.branching.incorrect_jump;
+            }
+        }
+
+        if (nextQuestionId && !jumpTime) {
             // ... (next question logic)
             setTimeout(function () {
                 var $submitBtn = $modal.find('.livq-submit-answer');
@@ -1524,24 +1534,34 @@ jQuery(document).ready(function ($) {
                 });
             }, 1000);
             setTimeout(function () {
-                showQuizOverlay($container, currentTimeSlot, $container.data('quiz-data').quiz);
+                if (!$questionContainer.find('.livq-submit-answer').is(':disabled')) {
+                    showQuizOverlay($container, currentTimeSlot, $container.data('quiz-data').quiz);
+                }
             }, 5000);
         } else {
             // ... (resume video logic)
             setTimeout(function () {
                 var $submitBtn = $modal.find('.livq-submit-answer');
-                $submitBtn.text('Continue Video');
+                $submitBtn.text(jumpTime ? 'Continue to Next Segment' : 'Continue Video');
                 $submitBtn.prop('disabled', false);
                 $submitBtn.off('click').on('click', function () {
                     hideQuizOverlay($container);
+                    if (jumpTime) {
+                        jumpToTime($container, jumpTime);
+                    }
                     resumeVideo($container);
                 });
             }, 1000);
 
             var delayTime = isCorrect ? 30000 : 25000;
             setTimeout(function () {
-                hideQuizOverlay($container);
-                resumeVideo($container);
+                if (!$questionContainer.find('.livq-submit-answer').is(':disabled')) {
+                    hideQuizOverlay($container);
+                    if (jumpTime) {
+                        jumpToTime($container, jumpTime);
+                    }
+                    resumeVideo($container);
+                }
             }, delayTime);
         }
     }
@@ -1808,6 +1828,14 @@ jQuery(document).ready(function ($) {
 
     function hideQuizOverlay($container) {
         $container.find('.livq-quiz-overlay').hide();
+    }
+
+    function jumpToTime($container, seconds) {
+        var player = $container.data('plyr-player');
+        if (player) {
+            player.currentTime = parseFloat(seconds);
+            console.log('Jumping to time:', seconds);
+        }
     }
 
     function resumeVideo($container) {
