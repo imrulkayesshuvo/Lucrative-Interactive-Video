@@ -2030,6 +2030,22 @@ jQuery(document).ready(function ($) {
             success: function (response) {
                 if (response.success) {
                     console.log('Quiz results submitted successfully');
+
+                    // Show Certificate Button if available (from Pro)
+                    if (response.data.certificate_url) {
+                        var $resultsOverlay = $container.find('.livq-results-overlay');
+                        var $content = $resultsOverlay.find('.livq-results-content');
+
+                        // Remove existing certificate button if any
+                        $content.find('.livq-certificate-btn').remove();
+
+                        var btnHtml = '<div style="margin-top: 20px; text-align: center;">';
+                        btnHtml += '<a href="' + response.data.certificate_url + '" target="_blank" class="livq-certificate-btn" style="display: inline-block; padding: 12px 24px; background: #d4af37; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">📜 Download Certificate</a>';
+                        btnHtml += '</div>';
+
+                        // Insert after the score
+                        $content.find('.livq-score-container').after(btnHtml);
+                    }
                 }
             },
             error: function () {

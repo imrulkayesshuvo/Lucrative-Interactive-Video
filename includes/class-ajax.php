@@ -127,12 +127,17 @@ class LIVQ_Ajax {
         // Allow PRO addon to process gamification, analytics, email notifications, etc.
         do_action('livq_after_score_calculation', $quiz_id, $score, $total_questions, $question_results);
         
-        wp_send_json_success(array(
+        $response = array(
             'score' => $score,
             'total_questions' => $total_questions,
             'percentage' => $total_questions > 0 ? round(($score / $total_questions) * 100) : 0,
-            'results' => $question_results
-        ));
+            'results' => $question_results,
+            'quiz_id' => $quiz_id
+        );
+        
+        $response = apply_filters('livq_quiz_submit_response', $response, $quiz_id, $score, $total_questions);
+        
+        wp_send_json_success($response);
     }
     
     /**
